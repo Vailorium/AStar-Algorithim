@@ -1,0 +1,34 @@
+#container{
+    border: 2px solid black;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.tile{
+    width: 20px;
+    height: 20px;
+    float: left;
+    background-color: white;
+    font-size: 10px;
+    color: white;
+    text-align:center;
+    line-height: 50px;
+}
+
+.player{
+    background-color: blue;
+}
+
+.target{
+    background-color: green;
+}
+
+.wall{
+    background-color: black !important;
+}
+
+.tile:hover{
+    background-color: rgba(0,0,0,0.6);
+}
