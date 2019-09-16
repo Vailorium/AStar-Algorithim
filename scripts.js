@@ -1,19 +1,19 @@
 var player = {x: 0, y: 0};
-var target = {x: 4, y: 4};
+var target = {x: 8, y: 9};
 
 var map = [];
 $("document").ready(function(){
-    console.clear();
+    console.clear(); //? Clear for debugging on VSCode
     generateMap();
-    // console.log(pathfind());
 });
+
+let path = [];
 
 function generateMap(){
     $("#container").html('');
     map = [];
     var gridsize = {x: parseInt($("#gridsize").val()), y: parseInt($("#gridsize").val())};
 
-    // console.log(gridSize);
     for(var x = 0; x < gridsize.x; x++){
         map[x] = [];
         for(var y = 0; y < gridsize.y; y++){
@@ -28,8 +28,14 @@ function generateMap(){
             map[x][y] = new Tile(x, y, type);
             const d = document.createElement("div");
             $(d).attr('id',`c${x}-${y}`);
+            $(d).data('x',x);
+            $(d).data('y',y);
             $(d).addClass('tile');
             $(d).addClass(type);
+
+            $(d).click(function(){ //? Log the tile on click
+                console.log(map[parseInt($(this).data('x'))][parseInt($(this).data('y'))]);
+            });
 
             $("#container").append(d);
         }
@@ -63,7 +69,7 @@ function pathfind(){
         //TODO: https://www.geeksforgeeks.org/a-search-algorithm/
 
         iterations++;
-        if(iterations > 10000){
+        if(iterations > 10000){ //? Overload just incase something goes horribly wrong
             console.log("Iterations overload");
             return [];
         }
@@ -85,10 +91,12 @@ function pathfind(){
             return arr.x != lowestTile.x && arr.y != lowestTile.y;
         });
 
+        
         neighbors = getNeighbors(map, lowestTile);
 
         for(neighbor of neighbors){
-
+            
+            
             if(neighbor.x == target.x && neighbor.y == target.y){ //* if is finished
                 neighbor.parent = lowestTile;
                 node = neighbor;
@@ -104,6 +112,12 @@ function pathfind(){
                 return path.reverse();
             }
 
+
+            // if(!((tile.x == player.x && tile.y == player.y) || (tile.x == target.x && tile.y == target.y) ) && $(`#c${neighbor.x}-${neighbor.y}`).css('background-color') != "rgb(128, 0, 128)"){
+            //     console.log($(`#c${neighbor.x}-${neighbor.y}`).css('background-color'));
+                 // $(`#c${neighbor.x}-${neighbor.y}`).css({'background-color':'pink'});
+            // }
+
             if(isInList(closedList, neighbor, "closedList") || neighbor.isWall()){
                 continue;
             }
@@ -113,7 +127,7 @@ function pathfind(){
 
             if(!isInList(openList, neighbor, "openList")){
                 gScoreIsBest = true;
-                neighbor.h = Math.abs(neighbor.x - lowestTile.x) + Math.abs(neighbor.y - lowestTile.y);
+                neighbor.h = Math.abs(neighbor.x - target.x) + Math.abs(neighbor.y - target.y);
                 openList.push(neighbor);
             }
             else if(gScore < neighbor.g){
@@ -126,26 +140,22 @@ function pathfind(){
             if(gScoreIsBest){
                 neighbor.parent = lowestTile;
 
-                neighbor.g = Math.abs(neighbor.x - player.x) + Math.abs(neighbor.y - player.y);    
+                neighbor.g = Math.abs(neighbor.x - lowestTile.x) + Math.abs(neighbor.y - lowestTile.y);    
                 neighbor.f = neighbor.g + neighbor.h;
             }
 
         }
         closedList.push(lowestTile);
     }
-
-    return [];
+    return []; //? Could not find a path, return empty list
 }
 
 function isInList(list, node, debug=""){
-    // console.log(debug, neighbor);
     for(tile of list){
         if(node.x == tile.x && node.y == tile.y && tile.f <= node.f){
-            // console.log(debug);
             return true;
         }
     }
-    // console.log(false);
     return false;
 }
 
@@ -154,31 +164,17 @@ function getNeighbors(grid, node){
     let returnList = [];
 
     if(grid[node.x - 1]){
-        if(!grid[node.x - 1][node.y].isWall()){
-            returnList.push(grid[node.x - 1][node.y]);
-        }
+        returnList.push(grid[node.x - 1][node.y]);
     }
     if(grid[node.x + 1]){
-        if(!grid[node.x + 1][node.y].isWall()){
-            returnList.push(grid[node.x + 1][node.y]);
-        }
+        returnList.push(grid[node.x + 1][node.y]);
     }
     if(grid[node.x][node.y - 1]){
-        if(!grid[node.x][node.y - 1].isWall()){
-            returnList.push(grid[node.x][node.y - 1]);
-        }
+        returnList.push(grid[node.x][node.y - 1]);
     }
     if(grid[node.x][node.y + 1]){
-        if(!grid[node.x][node.y + 1].isWall()){
-            returnList.push(grid[node.x][node.y + 1]);
-        }
+        returnList.push(grid[node.x][node.y + 1]);
     }
-
-    // for(tile of returnList){
-    //     console.log(`tile`, tile);
-    //     console.log(`parent`, node);
-    //     tile.parent = node;
-    // }
 
     return returnList;
 }
