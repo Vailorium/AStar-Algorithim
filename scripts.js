@@ -140,7 +140,7 @@ function pathfind(){
             if(gScoreIsBest){
                 neighbor.parent = lowestTile;
 
-                neighbor.g = Math.abs(neighbor.x - lowestTile.x) + Math.abs(neighbor.y - lowestTile.y);    
+                // neighbor.g = Math.abs(neighbor.x - lowestTile.x) + Math.abs(neighbor.y - lowestTile.y);    
                 neighbor.f = neighbor.g + neighbor.h;
             }
 
